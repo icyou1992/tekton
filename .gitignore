@@ -1,0 +1,10 @@
+.git
+
+**/.terraform/*
+
+*.tfstate
+*.tfstate.*
+
+*.tfvars
+
+.terraformrc
