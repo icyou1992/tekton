@@ -11,7 +11,7 @@ resource "aws_route_table" "rt_public" {
 }
 
 resource "aws_route_table" "rt_private" {
-  count  = length(aws_subnet.subnet_private)
+  count  = length(aws_subnet.subnet_public)
   vpc_id = aws_vpc.vpc.id
 
   route {
@@ -32,5 +32,5 @@ resource "aws_route_table_association" "rta_public" {
 resource "aws_route_table_association" "rta_private" {
   count          = length(aws_subnet.subnet_private)
   subnet_id      = aws_subnet.subnet_private[count.index].id
-  route_table_id = aws_route_table.rt_private[count.index].id
+  route_table_id = aws_route_table.rt_private[count.index % length(aws_route_table.rt_private)].id
 }

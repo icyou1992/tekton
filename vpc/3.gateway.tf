@@ -9,7 +9,7 @@ resource "aws_internet_gateway" "igw" {
 resource "aws_nat_gateway" "ngw" {
   count = length(aws_subnet.subnet_public)
 
-  subnet_id = aws_subnet.subnet_private[count.index].id
+  subnet_id = aws_subnet.subnet_public[count.index].id
   allocation_id = aws_eip.eip_ngw[count.index].id
   connectivity_type = try(var.subnet_private.connectivity_type, "public")
 
