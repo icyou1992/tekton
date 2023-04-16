@@ -1,5 +1,9 @@
+locals {
+  cluster_name = "clst-${var.tag_common}"
+}
+
 resource "aws_eks_cluster" "cluster" {
-  name     = "clst-${var.tag_common}"
+  name     = local.cluster_name
   role_arn = aws_iam_role.role_cluster.arn
   version  = lookup(var.eks, "version", "1.25")
 
@@ -7,7 +11,7 @@ resource "aws_eks_cluster" "cluster" {
     endpoint_private_access = lookup(var.eks, "endpoint_private_access", true)
     endpoint_public_access  = lookup(var.eks, "endpoint_public_access", true)
     # security_group_ids      = lookup(var.eks, "security_group_ids", [])
-    security_group_ids      = [ aws_security_group.securitygroup_cluster.id ]
+    # security_group_ids      = [ aws_security_group.securitygroup_cluster.id ]
     subnet_ids              = var.subnet_ids
   }
   
@@ -26,7 +30,7 @@ resource "aws_eks_addon" "addon" {
 }
 
 resource "aws_iam_openid_connect_provider" "oidc_provider" {
-  url             = data.tls_certificate.certificate.url
+  url             = aws_eks_cluster.cluster.identity[0].oidc[0].issuer
   client_id_list  = [ "sts.amazonaws.com" ]
   thumbprint_list = [ data.tls_certificate.certificate.certificates.0.sha1_fingerprint ]
 }
@@ -71,6 +75,12 @@ resource "aws_security_group" "securitygroup_cluster" {
     cidr_blocks = [ var.vpc_cidr ]
   }
 
+  ingress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
   egress {
     from_port = 0
@@ -78,11 +88,27 @@ resource "aws_security_group" "securitygroup_cluster" {
     protocol = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+  
+  tags = {
+    "Name" = "sg-eksclst-${var.tag_common}"
+    "kubernetes.io/cluster/${local.cluster_name}" = "owned"
+    "aws:eks:cluster-name" = "${local.cluster_name}"
+  }
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
-#   tags = {
-#     "Name" = "sg-eksclst-${var.tag_common}"
-#     # "kubernetes.io/cluster/${aws_eks_cluster.cluster.name}" = "owned"
-#     # "aws:eks:cluster-name" = "${aws_eks_cluster.cluster.name}"
-#   }
+# resource "aws_ec2_tag" "tag_eks_securitygroup_1" {
+#   resource_id = aws_security_group.securitygroup_cluster.id
+#   key         = "kubernetes.io/cluster/${aws_eks_cluster.cluster.name}"
+#   value       = "owned"
+# }
+
+# resource "aws_ec2_tag" "tag_eks_securitygroup_2" {
+#   resource_id = aws_security_group.securitygroup_cluster.id
+#   key         = "aws:eks:cluster-name"
+#   value       = "${aws_eks_cluster.cluster.name}"
 # }

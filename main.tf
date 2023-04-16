@@ -25,11 +25,16 @@ module "vpc" {
       cidrsubnet("10.0.0.0/20", 4, 3),
       cidrsubnet("10.0.0.0/20", 4, 4)
     ]
+    azs = [
+      "ap-northeast-2a",
+      "ap-northeast-2c",
+    ]
   }
 }
 
 module "eks" {
   source = "./eks"
+  # depends_on = [ module.vpc ]
 
   # local.common으로 variable을 넘기면 role, launch template name 생성 과정에서 동적 할당이라 validate error가 발생하는 것으로 보임
   # tag_common = local.common
@@ -42,7 +47,7 @@ module "eks" {
   eks = {
     version       = "1.25"
     instance_type = "t3.medium"
-    key = "pfe"
+    key           = "pfe"
 
     block_device_mappings = {}
 
@@ -65,19 +70,25 @@ module "eks" {
       # }
     }
   }
-
 }
 
-module "k8s" {
-  source = "./k8s"
+# module "k8s" {
+#   source = "./k8s"
+#   # depends_on = [ module.eks ]
 
-  tag_common = "pfe-dev"
-  cluster = module.eks.cluster
+#   tag_common = "pfe-dev"
+#   cluster    = module.eks.cluster
 
-  enable_aws_ebs_csi_driver = true
-  enable_aws_load_balancer_controller = true
+#   vpc_id             = module.vpc.vpc_id
+#   subnet_public_ids  = module.vpc.subnet_public_ids
+#   subnet_private_ids = module.vpc.subnet_private_ids
 
-  k8s = {}
+#   enable_aws_ebs_csi_driver           = true
+#   enable_aws_load_balancer_controller = true
 
-}
+#   k8s = {
+#     name = "game-2048"
+#   }
+
+# }
 

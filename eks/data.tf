@@ -1,3 +1,10 @@
+data "aws_region" "current" {}
+data "aws_caller_identity" "current" {}
+
+data "aws_eks_cluster_auth" "eks_auth" {
+  name = aws_eks_cluster.cluster.name
+}
+
 data "aws_ssm_parameter" "ami" {
   name = "/aws/service/eks/optimized-ami/${aws_eks_cluster.cluster.version}/amazon-linux-2/recommended/image_id"
 }
@@ -41,21 +48,21 @@ data "aws_iam_policy_document" "policy_assume_role_nodegroup" {
 
 ###################################
 
-# data "aws_ami" "ubuntu" {
-#   most_recent = true
+data "aws_ami" "ubuntu" {
+  most_recent = true
 
-#   filter {
-#     name = "name"
-#     values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
-#   }
+  filter {
+    name = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+  }
 
-#   filter {
-#     name = "virtualization-type"
-#     values = ["hvm"]
-#   }
+  filter {
+    name = "virtualization-type"
+    values = ["hvm"]
+  }
 
-#   owners = ["099720109477"]
-# }
+  owners = ["099720109477"]
+}
 
 # data "aws_ami" "al2" {
 #   most_recent = true

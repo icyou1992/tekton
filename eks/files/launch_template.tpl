@@ -10,4 +10,4 @@ sudo /etc/eks/bootstrap.sh ${cluster-name} --apiserver-endpoint ${apiserver-endp
 sudo yum install -y amazon-ssm-agent
 systemctl enable amazon-ssm-agent && systemctl start amazon-ssm-agent
 
---==MYBOUNDARY==--
+--==MYBOUNDARY==--\
