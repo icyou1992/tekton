@@ -1,6 +1,6 @@
-output "cluster" {
-  value = module.eks.cluster
-}
+# output "cluster" {
+#   value = module.eks.cluster
+# }
 
 output "cluster_name" {
   value = module.eks.cluster_name

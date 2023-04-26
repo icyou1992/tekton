@@ -4,7 +4,7 @@ resource "aws_eks_node_group" "nodegroup" {
   
   # release_version = nonsensitive(data.aws_ssm_parameter.ami.value)
   node_role_arn = aws_iam_role.role_nodegroup.arn
-  subnet_ids    = var.subnet_ids
+  subnet_ids    = var.subnet_private_ids
 
   capacity_type  = lookup(var.eks, "capacity_type", "ON_DEMAND")
   # ami_type       = "AL2_x86_64"
@@ -15,7 +15,7 @@ resource "aws_eks_node_group" "nodegroup" {
   #   ec2_ssh_key = lookup(var.eks, "key", "")
   #   source_security_group_ids = [ aws_security_group.securitygroup_cluster.id ]
   # }
-  
+
   launch_template {
     name    = aws_launch_template.launchtemplate.name
     version = aws_launch_template.launchtemplate.latest_version
@@ -83,6 +83,12 @@ resource "aws_launch_template" "launchtemplate" {
       "aws:eks:cluster-name"                                  = aws_eks_cluster.cluster.name
     }, lookup(var.eks, "tags", null))
   }
+
+  lifecycle {
+    ignore_changes = [
+      tag_specifications
+    ]
+  }
 }
 
 resource "aws_iam_role" "role_nodegroup" {
@@ -95,12 +101,4 @@ resource "aws_iam_role" "role_nodegroup" {
     "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly",
     "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
   ]
-}
-
-resource "aws_ec2_tag" "tag_eks_subnet" {
-  count = length(var.subnet_ids)
-
-  resource_id = var.subnet_ids[count.index]
-  key         = "kubernetes.io/cluster/${aws_eks_cluster.cluster.name}"
-  value       = "shared"
 }

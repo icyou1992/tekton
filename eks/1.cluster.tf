@@ -11,8 +11,8 @@ resource "aws_eks_cluster" "cluster" {
     endpoint_private_access = lookup(var.eks, "endpoint_private_access", true)
     endpoint_public_access  = lookup(var.eks, "endpoint_public_access", true)
     # security_group_ids      = lookup(var.eks, "security_group_ids", [])
-    # security_group_ids      = [ aws_security_group.securitygroup_cluster.id ]
-    subnet_ids              = var.subnet_ids
+    security_group_ids      = [ aws_security_group.securitygroup_cluster.id ]
+    subnet_ids              = var.subnet_private_ids
   }
   
   enabled_cluster_log_types = lookup(var.eks, "enabled_cluster_log_types", [])
@@ -112,3 +112,11 @@ resource "aws_security_group" "securitygroup_cluster" {
 #   key         = "aws:eks:cluster-name"
 #   value       = "${aws_eks_cluster.cluster.name}"
 # }
+
+resource "aws_ec2_tag" "tag_eks_subnet" {
+  count = length(concat(var.subnet_public_ids, var.subnet_private_ids))
+
+  resource_id = concat(var.subnet_public_ids, var.subnet_private_ids)[count.index]
+  key         = "kubernetes.io/cluster/${aws_eks_cluster.cluster.name}"
+  value       = "shared"
+}

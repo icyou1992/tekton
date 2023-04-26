@@ -16,7 +16,7 @@ module "vpc" {
   subnet_public = {
     cidr = [
       cidrsubnet("10.0.0.0/20", 4, 1),
-      # cidrsubnet("10.0.0.0/20", 4, 2) 
+      cidrsubnet("10.0.0.0/20", 4, 2) 
     ]
   }
 
@@ -42,10 +42,11 @@ module "eks" {
 
   vpc_id     = module.vpc.vpc_id
   vpc_cidr   = module.vpc.vpc_cidr
-  subnet_ids = module.vpc.subnet_private_ids
+  subnet_public_ids  = module.vpc.subnet_public_ids
+  subnet_private_ids = module.vpc.subnet_private_ids
 
   eks = {
-    version       = "1.25"
+    version       = "1.26"
     instance_type = "t3.medium"
     key           = "pfe"
 
@@ -72,23 +73,23 @@ module "eks" {
   }
 }
 
-# module "k8s" {
-#   source = "./k8s"
-#   # depends_on = [ module.eks ]
+module "k8s" {
+  source = "./k8s"
+  # depends_on = [ module.eks ]
 
-#   tag_common = "pfe-dev"
-#   cluster    = module.eks.cluster
+  tag_common = "pfe-dev"
+  cluster    = module.eks.cluster
 
-#   vpc_id             = module.vpc.vpc_id
-#   subnet_public_ids  = module.vpc.subnet_public_ids
-#   subnet_private_ids = module.vpc.subnet_private_ids
+  vpc_id             = module.vpc.vpc_id
+  subnet_public_ids  = module.vpc.subnet_public_ids
+  subnet_private_ids = module.vpc.subnet_private_ids
 
-#   enable_aws_ebs_csi_driver           = true
-#   enable_aws_load_balancer_controller = true
+  enable_aws_ebs_csi_driver           = true
+  enable_aws_load_balancer_controller = true
 
-#   k8s = {
-#     name = "game-2048"
-#   }
+  # k8s = {
+  #   name = "game-2048"
+  # }
+}
 
-# }
 

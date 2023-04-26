@@ -13,8 +13,18 @@ resource "kubernetes_service_account" "serviceaccount_aws_load_balancer_controll
       # "eks.amazonaws.com/sts-regional-endpoints" = "true"
     }
   }
-  automount_service_account_token = true
+  secret {}
+  # secret {
+  #   name = kubernetes_secret.secret_aws_load_balancer_controller.metadata.0.name
+  # }
+  # automount_service_account_token = true
 }
+
+# resource "kubernetes_secret" "secret_aws_load_balancer_controller" {
+#   metadata {
+#     name = "aws-load-balancer"
+#   }
+# }
 
 resource "aws_iam_role" "role_aws_load_balancer_controller" {
   count = var.enable_aws_load_balancer_controller ? 1 : 0
@@ -40,25 +50,14 @@ resource "aws_ec2_tag" "tag_public_aws_load_balancer_controller" {
   resource_id = var.subnet_public_ids[count.index]
   key         = "kubernetes.io/role/elb"
   value       = 1
-
-  # lifecycle {
-  #   replace_triggered_by = [
-  #     var.subnet_public_ids
-  #   ]
-  # }
 }
+
 resource "aws_ec2_tag" "tag_private_aws_load_balancer_controller" {
   count = length(var.subnet_private_ids)
 
   resource_id = var.subnet_private_ids[count.index]
   key         = "kubernetes.io/role/internal-elb"
   value       = 1
-
-  # lifecycle {
-  #   replace_triggered_by = [
-  #     var.subnet_private_ids
-  #   ]
-  # }
 }
 
 resource "helm_release" "aws_load_balancer_controller" {

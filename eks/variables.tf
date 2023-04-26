@@ -9,6 +9,7 @@ variable "tag_common" {
 
 variable "vpc_id" {}
 variable "vpc_cidr" {}
-variable "subnet_ids" {}
+variable "subnet_public_ids" {}
+variable "subnet_private_ids" {}
 
 variable "eks" {}

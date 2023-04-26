@@ -13,4 +13,6 @@ variable "encryption_key" {
   nullable = true
 }
 
-variable "k8s" {}
+variable "k8s" {
+  default = {}
+}
