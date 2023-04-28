@@ -66,7 +66,11 @@ resource "aws_instance" "bastion" {
   sudo echo "region = ap-northeast-2" >> /home/ubuntu/.aws/config
   sudo echo "output = json" >> /home/ubuntu/.aws/config
 
-  aws eks update-kubeconfig --name ${module.eks.cluster.name}
+  sudo aws eks update-kubeconfig --name ${module.eks.cluster.name}
+
+  curl -LO https://github.com/tektoncd/cli/releases/download/v0.30.1/tektoncd-cli-0.30.1_Linux-64bit.deb
+  sudo dpkg -i ./tektoncd-cli-0.30.1_Linux-64bit.deb
+
   EOF
 
   tags = {

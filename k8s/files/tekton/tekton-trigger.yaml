@@ -1,0 +1,38 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: clone-read-template
+spec:
+  params:
+  - name: url
+    value: $(tt.params.username)
+  - name: revision
+    default: main
+  resourcetemplates:
+  - apiVersion: tekton.dev/v1beta1
+    kind: PipelineRun
+    metadata:
+      generateName: clone-read-run-
+    spec:
+      pipelineRef:
+        name: clone-read
+      params:
+      - name: url
+        value: $(tt.params.url)
+      - name: revision
+        value: $(tt.params.revision)
+      workspaces:
+      - name: shared-data
+        persistentVolumeClaim:
+          claimName: tekton-pvc
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerBinding
+metadata:
+  name: clone-read-binding
+spec: 
+  params:
+  - name: url
+    value: $(body.repository.url)
+  - name: revision
+    value: $(body.repository.revision)

@@ -18,3 +18,10 @@ spec:
             name: tekton-dashboard
             port:
               number: 9097
+      - path: /event
+        pathType: Prefix
+        backend:
+          service:
+            name: tekton-webhook
+            port:
+              number: 8080

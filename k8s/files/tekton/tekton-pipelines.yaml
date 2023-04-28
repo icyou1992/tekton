@@ -1,0 +1,99 @@
+# install git-clone task first
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: show-readme
+spec:
+  description: Read and display README file.
+  workspaces:
+  - name: source
+  steps:
+  - name: read
+    image: alpine:latest
+    script: | 
+      #!/usr/bin/env sh
+      cat $(workspaces.source.path)/README.md
+---
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: clone-read
+spec:
+  description: | 
+    This pipeline clones a git repo, then echoes the README file to the stout.
+  params:
+  - name: repo-url
+    type: string
+    description: The git repo URL to clone from.
+  workspaces:
+  - name: shared-data
+    description: | 
+      This workspace contains the cloned repo files, so they can be read by the
+      next task.
+  # - name: git-credentials
+  #   description: My ssh credentials
+  tasks:
+  - name: fetch-source
+    taskRef:
+      name: git-clone
+    workspaces:
+    - name: output
+      workspace: shared-data
+    # - name: ssh-directory
+    #   workspace: git-credentials
+    params:
+    - name: url
+      value: $(params.repo-url)
+  - name: show-readme
+    runAfter: ["fetch-source"]
+    taskRef:
+      name: show-readme
+    workspaces:
+    - name: source
+      workspace: shared-data
+
+
+
+---
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  generateName: clone-read-run-
+spec:
+  pipelineRef:
+    name: clone-read
+  podTemplate:
+    securityContext:
+      fsGroup: 65532
+  workspaces:
+  - name: shared-data
+    persistentVolumeClaim:
+      claimName: tekton-pvc
+  params:
+  - name: repo-url
+    value: https://github.com/icyou1992/tekton-test
+
+
+# apiVersion: tekton.dev/v1beta1
+# kind: Pipeline
+# metadata:
+#   name: tekton-sample-pipeline
+# spec:
+#   workspaces:
+#     - name: pipeline-shared-data
+#   tasks:
+#     - name: clone-repository
+#       params:
+#         - name: url
+#           value: https://github.com/icyou1992/tekton-test
+#         - name: revision
+#           value: "master"
+#         - name: deleteExisting
+#           value: "true"
+#       taskRef:
+#         kind: Task
+#         name: git-clone
+#       workspaces:
+#         - name: output
+#           workspace: pipeline-shared-data

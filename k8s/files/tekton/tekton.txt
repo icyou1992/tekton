@@ -1,0 +1,13 @@
+0. tkn 설치 
+curl -LO https://github.com/tektoncd/cli/releases/download/v0.30.1/tektoncd-cli-0.30.1_Linux-64bit.deb
+sudo dpkg -i ./tektoncd-cli-0.30.1_Linux-64bit.deb
+1. install tekton dashboard
+2. kubectl apply -f ingress.yaml
+3. kubectl apply -f tekton-pvc.yaml
+
+1-1. github repo에 있는 소스 tekton pvc로 가져오기
+1. kubectl apply -f https://raw.githubusercontent.com/tektoncd/catalog/main/task/git-clone/0.9/git-clone.yaml
+
+2. install tekton-pipelines.yaml
+
+# 여기까지는 github에서 pipeline으로 소스 가져오기
