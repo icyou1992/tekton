@@ -59,7 +59,7 @@ spec:
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  generateName: clone-read-run-
+  generateName: pipelinerun-clone-read-
 spec:
   pipelineRef:
     name: clone-read
@@ -72,6 +72,7 @@ spec:
       claimName: tekton-pvc
   params:
   - name: repo-url
+    # test할 repository url을 적어줍니다.
     value: https://github.com/icyou1992/tekton-test
 
 
