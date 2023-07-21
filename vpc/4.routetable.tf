@@ -11,12 +11,12 @@ resource "aws_route_table" "rt_public" {
 }
 
 resource "aws_route_table" "rt_private" {
-  count  = length(aws_subnet.subnet_public)
+  count  = length(aws_subnet.subnet_private)
   vpc_id = aws_vpc.vpc.id
 
   route {
     cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.ngw[count.index].id
+    nat_gateway_id = aws_nat_gateway.ngw[count.index % length(aws_subnet.subnet_public)].id
   }
   tags = {
     Name = "rt-prv-${var.tag_common}-${count.index}"
@@ -32,5 +32,5 @@ resource "aws_route_table_association" "rta_public" {
 resource "aws_route_table_association" "rta_private" {
   count          = length(aws_subnet.subnet_private)
   subnet_id      = aws_subnet.subnet_private[count.index].id
-  route_table_id = aws_route_table.rt_private[count.index % length(aws_route_table.rt_private)].id
+  route_table_id = aws_route_table.rt_private[count.index % length(aws_subnet.subnet_public)].id
 }

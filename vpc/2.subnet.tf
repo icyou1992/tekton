@@ -8,7 +8,7 @@ resource "aws_subnet" "subnet_public" {
 
   map_public_ip_on_launch = true
   tags = {
-    Name = "sbn-pbl-${var.tag_common}"
+    Name = "sbn-pbl-${var.tag_common}-${count.index + 1}"
   }
   lifecycle {
     ignore_changes = [
@@ -25,7 +25,7 @@ resource "aws_subnet" "subnet_private" {
   cidr_block = var.subnet_private.cidr[count.index]
   map_public_ip_on_launch = true
   tags = {
-    Name = "sbn-prv-${var.tag_common}"
+    Name = "sbn-prv-${var.tag_common}-${count.index + 1}"
   }
   lifecycle {
     ignore_changes = [

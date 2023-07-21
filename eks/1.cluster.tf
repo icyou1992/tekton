@@ -11,10 +11,10 @@ resource "aws_eks_cluster" "cluster" {
     endpoint_private_access = lookup(var.eks, "endpoint_private_access", true)
     endpoint_public_access  = lookup(var.eks, "endpoint_public_access", true)
     # security_group_ids      = lookup(var.eks, "security_group_ids", [])
-    security_group_ids      = [ aws_security_group.securitygroup_cluster.id ]
-    subnet_ids              = var.subnet_private_ids
+    security_group_ids = [aws_security_group.securitygroup_cluster.id]
+    subnet_ids         = var.subnet_private_ids
   }
-  
+
   enabled_cluster_log_types = lookup(var.eks, "enabled_cluster_log_types", [])
 }
 
@@ -24,15 +24,15 @@ resource "aws_eks_addon" "addon" {
   cluster_name = aws_eks_cluster.cluster.name
   addon_name   = each.key
 
-  addon_version            = lookup(each.value, "addon_version", data.aws_eks_addon_version.latest[each.key].version)
-  resolve_conflicts        = lookup(each.value, "resolve_conflicts", null)
-  service_account_role_arn = lookup(each.value, "service_account_role_arn", null)
+  addon_version               = lookup(each.value, "addon_version", data.aws_eks_addon_version.latest[each.key].version)
+  service_account_role_arn    = lookup(each.value, "service_account_role_arn", null)
+  resolve_conflicts_on_update = lookup(each.value, "resolve_conflicts_on_update", "PRESERVE")
 }
 
 resource "aws_iam_openid_connect_provider" "oidc_provider" {
   url             = aws_eks_cluster.cluster.identity[0].oidc[0].issuer
-  client_id_list  = [ "sts.amazonaws.com" ]
-  thumbprint_list = [ data.tls_certificate.certificate.certificates.0.sha1_fingerprint ]
+  client_id_list  = ["sts.amazonaws.com"]
+  thumbprint_list = [data.tls_certificate.certificate.certificates.0.sha1_fingerprint]
 }
 
 resource "aws_iam_role" "role_cluster" {
@@ -51,48 +51,48 @@ resource "aws_security_group" "securitygroup_cluster" {
   vpc_id = var.vpc_id
 
   ingress {
-    from_port = 22
-    to_port = 22
-    protocol = "tcp"
-    cidr_blocks = [ var.vpc_cidr ]
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = [var.vpc_cidr]
   }
   ingress {
-    from_port = 53
-    to_port = 53
-    protocol = "tcp"
-    cidr_blocks = [ var.vpc_cidr ]
+    from_port   = 53
+    to_port     = 53
+    protocol    = "tcp"
+    cidr_blocks = [var.vpc_cidr]
   }
   ingress {
-    from_port = 443
-    to_port = 443
-    protocol = "tcp"
-    cidr_blocks = [ var.vpc_cidr ]
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = [var.vpc_cidr]
   }
   ingress {
-    from_port = 10250
-    to_port = 10250
-    protocol = "tcp"
-    cidr_blocks = [ var.vpc_cidr ]
+    from_port   = 10250
+    to_port     = 10250
+    protocol    = "tcp"
+    cidr_blocks = [var.vpc_cidr]
   }
 
   ingress {
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  
+
   tags = {
-    "Name" = "sg-eksclst-${var.tag_common}"
+    "Name"                                        = "sg-eksclst-${var.tag_common}"
     "kubernetes.io/cluster/${local.cluster_name}" = "owned"
-    "aws:eks:cluster-name" = "${local.cluster_name}"
+    "aws:eks:cluster-name"                        = "${local.cluster_name}"
   }
   lifecycle {
     ignore_changes = [
