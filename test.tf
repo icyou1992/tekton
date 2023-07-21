@@ -34,7 +34,7 @@ resource "aws_instance" "bastion" {
   subnet_id = module.vpc.subnet_public_ids[0]
   vpc_security_group_ids = [ aws_security_group.securitygroup.id ]  
 
-  key_name = "pfe"
+  key_name = local.key
   associate_public_ip_address = true
 
   root_block_device {

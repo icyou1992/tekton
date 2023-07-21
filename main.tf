@@ -4,6 +4,7 @@ locals {
   common = "${local.id}-${local.env}"
 
   cidr = "10.0.0.0/20"
+  key = "pfe"
 }
 
 module "vpc" {
@@ -50,7 +51,7 @@ module "eks" {
   eks = {
     version       = "1.27"
     instance_type = "t3.medium"
-    key           = "pfe"
+    key           = local.key
 
     block_device_mappings = {}
 
