@@ -34,6 +34,6 @@ resource "aws_iam_policy" "policy_ebs_csi_driver_kms" {
 
   path = "/"
   policy = templatefile("${path.module}/files/policy_ebs_csi_driver_kms.json.tpl", {
-    kms_key_arn = var.encryption_key != null ? var.encryption_key : data.aws_ebs_default_kms_key.current.key_arn
+    kms_key_arn = var.encryption_key != null ? var.encryption_key : data.aws_kms_key.current.arn
   })
 }

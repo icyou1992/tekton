@@ -2,6 +2,10 @@ data "aws_region" "current" {}
 data "aws_caller_identity" "current" {}
 data "aws_ebs_default_kms_key" "current" {}
 
+data "aws_kms_key" "current" {
+  key_id = data.aws_ebs_default_kms_key.current.key_arn
+}
+
 data "aws_eks_cluster_auth" "eks_auth" {
   name = var.cluster.name
 }

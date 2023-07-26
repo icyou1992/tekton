@@ -45,10 +45,11 @@ resource "aws_launch_template" "launchtemplate" {
   # key_name = 
   key_name = lookup(var.eks, "key", null)
 
-  update_default_version = lookup(var.eks, "update_default_version", true)
+  update_default_version = lookup(var.eks, "update_default_version", false)
   ebs_optimized          = lookup(var.eks, "ebs_optimized", true)
   vpc_security_group_ids = lookup(var.eks, "vpc_security_group_ids", [])
   # vpc_security_group_ids = [ aws_security_group.securitygroup_launchtemplate.id ]
+  
 
   dynamic "block_device_mappings" {
     for_each = lookup(var.eks, "block_device_mappings", [])

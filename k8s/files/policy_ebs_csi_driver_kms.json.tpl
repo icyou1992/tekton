@@ -8,9 +8,7 @@
         "kms:ListGrants",
         "kms:RevokeGrant"
       ],
-      "Resource": [
-        "${kms_key_arn}"
-      ],
+      "Resource": "${kms_key_arn}",
       "Condition": {
         "Bool": {
           "kms:GrantIsForAWSResource": "true"
@@ -26,9 +24,7 @@
         "kms:GenerateDataKey*",
         "kms:DescribeKey"
       ],
-      "Resource": [
-        "${kms_key_arn}"
-      ]
+      "Resource": "${kms_key_arn}"
     }    
   ]
 }

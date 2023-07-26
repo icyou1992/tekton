@@ -26,6 +26,7 @@ resource "aws_eks_addon" "addon" {
 
   addon_version               = lookup(each.value, "addon_version", data.aws_eks_addon_version.latest[each.key].version)
   service_account_role_arn    = lookup(each.value, "service_account_role_arn", null)
+  resolve_conflicts_on_create = lookup(each.value, "resolve_conflicts_on_create", "OVERWRITE")
   resolve_conflicts_on_update = lookup(each.value, "resolve_conflicts_on_update", "PRESERVE")
 }
 
