@@ -53,15 +53,15 @@ module "eks" {
     instance_type = "t3.medium"
     key           = local.key
 
-    block_device_mappings = {
+    block_device_mappings = [{
       device_name = "/dev/xvda"
-      ebs = {
+      ebs = [{
         volume_size = 10
         volume_type = "gp3"
         encrypted = true
         kms_key_id = data.aws_ebs_default_kms_key.current.key_arn
-      }
-    }
+      }]
+    }]
 
     addons = {
       coredns = {
