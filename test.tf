@@ -27,7 +27,7 @@ data "aws_ami" "al2" {
   owners = ["amazon"]
 }
 
-resource "aws_instance" "bastion" {
+resource "aws_instance" "ec2-bastion" {
   instance_type = "t3.small"
   ami = data.aws_ami.ubuntu.id
 
@@ -37,6 +37,8 @@ resource "aws_instance" "bastion" {
   key_name = local.key
   associate_public_ip_address = true
 
+  iam_instance_profile = aws_iam_instance_profile.iprf-bastion.name
+  
   root_block_device {
     volume_type = "gp3"
     volume_size = "30"
@@ -55,16 +57,16 @@ resource "aws_instance" "bastion" {
   echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
   sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
   
-  sudo mkdir /home/ubuntu/.aws
-  sudo touch /home/ubuntu/.aws/credentials
-  sudo echo "[default]" >> /home/ubuntu/.aws/credentials
-  sudo echo "aws_access_key_id = ${var.aws_access_key_id}" >> /home/ubuntu/.aws/credentials
-  sudo echo "aws_secret_access_key = ${var.aws_secret_key_id}" >> /home/ubuntu/.aws/credentials
+  # sudo mkdir /home/ubuntu/.aws
+  # sudo touch /home/ubuntu/.aws/credentials
+  # sudo echo "[default]" >> /home/ubuntu/.aws/credentials
+  # sudo echo "aws_access_key_id = ${var.aws_access_key_id}" >> /home/ubuntu/.aws/credentials
+  # sudo echo "aws_secret_access_key = ${var.aws_secret_key_id}" >> /home/ubuntu/.aws/credentials
 
-  sudo touch /home/ubuntu/.aws/config
-  sudo echo "[default]" >> /home/ubuntu/.aws/config
-  sudo echo "region = ap-northeast-2" >> /home/ubuntu/.aws/config
-  sudo echo "output = json" >> /home/ubuntu/.aws/config
+  # sudo touch /home/ubuntu/.aws/config
+  # sudo echo "[default]" >> /home/ubuntu/.aws/config
+  # sudo echo "region = ap-northeast-2" >> /home/ubuntu/.aws/config
+  # sudo echo "output = json" >> /home/ubuntu/.aws/config
 
   sudo aws eks update-kubeconfig --name ${module.eks.cluster.name}
 
@@ -80,6 +82,34 @@ resource "aws_instance" "bastion" {
   depends_on = [
     module.eks
   ]
+}
+
+resource "aws_iam_role" "role-bastion" {
+  name = "role-ec2-${local.common}"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = ""
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      },
+    ]
+  })
+
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/ReadOnlyAccess",
+    "arn:aws:iam::aws:policy/AmazonEKSServicePolicy",
+  ]
+}
+
+resource "aws_iam_instance_profile" "iprf-bastion" {
+  name = "iprf-ec2-${local.common}"
+  role = aws_iam_role.role-bastion.name
 }
 
 resource "aws_security_group" "securitygroup" {
@@ -109,5 +139,5 @@ resource "aws_security_group" "securitygroup" {
 }
 
 output "ec2_ip" {
-  value = aws_instance.bastion.public_ip
+  value = aws_instance.ec2-bastion.public_ip
 }

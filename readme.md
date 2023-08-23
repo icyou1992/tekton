@@ -1,10 +1,11 @@
 ## tekton 체험해보기
 
 ### EKS 환경
-1. test 환경이 겹치지 않으려면 main.tf에 있는 locals의 id와 env 변수를 변경하고 main.tf와 같은 경로에 secret.auto.tfvars 파일을 만들어서 aws_access_key_id와 aws_secret_key_id를 각각 입력해주어야 합니다.
-2. vpc, subnet cidr은 main.tf에서 설정할 수 있으며, 만들어진 public subnet만큼 nat gateway가 생성되므로 public subnet을 많이 생성하는 것은 권장하지 않습니다.
-3. main.tf의 eks module 부분에서 eks version과 instance type, instance에 접근할 수 있는 key name을 설정할 수 있습니다.
-4. k8s module에서 ebs csi driver와 aws load balancer controller를 자동으로 설치하도록 설정해두었으며, ebs csi driver는 tekton에서 pvc를 사용하기 때문에 필요하고 aws load balancer controller는 dashboard를 외부에 노출시키기 위해 필요합니다.
+1. test 환경이 겹치지 않으려면 main.tf에 있는 locals의 id와 env 변수를 변경하고 main.tf와 같은 경로에 secret.auto.tfvars 파일을 만들어서 aws_access_key_id와 aws_secret_key_id를 각각 입력해주어야 합니다.2
+2. test instance에서 aws eks update-kubeconfig --name \[eks cluster name\]을 통해 test instance에서 kubectl 명령을 날릴 수 있도록 합니다.
+3. vpc, subnet cidr은 main.tf에서 설정할 수 있으며, 만들어진 public subnet만큼 nat gateway가 생성되므로 public subnet을 많이 생성하는 것은 권장하지 않습니다.
+4. main.tf의 eks module 부분에서 eks version과 instance type, instance에 접근할 수 있는 key name을 설정할 수 있습니다.
+5. k8s module에서 ebs csi driver와 aws load balancer controller를 자동으로 설치하도록 설정해두었으며, ebs csi driver는 tekton에서 pvc를 사용하기 때문에 필요하고 aws load balancer controller는 dashboard를 외부에 노출시키기 위해 필요합니다.
 
 ### Tekton 설치 과정
 1. install tekton pipeline
