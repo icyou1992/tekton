@@ -13,18 +13,18 @@ resource "kubernetes_service_account" "serviceaccount_aws_load_balancer_controll
       # "eks.amazonaws.com/sts-regional-endpoints" = "true"
     }
   }
-  secret {}
-  # secret {
-  #   name = kubernetes_secret.secret_aws_load_balancer_controller.metadata.0.name
-  # }
-  # automount_service_account_token = true
+  # secret {}
+  secret {
+    name = kubernetes_secret.secret_aws_load_balancer_controller.metadata.0.name
+  }
+  automount_service_account_token = true
 }
 
-# resource "kubernetes_secret" "secret_aws_load_balancer_controller" {
-#   metadata {
-#     name = "aws-load-balancer"
-#   }
-# }
+resource "kubernetes_secret" "secret_aws_load_balancer_controller" {
+  metadata {
+    name = "aws-load-balancer"
+  }
+}
 
 resource "aws_iam_role" "role_aws_load_balancer_controller" {
   count = var.enable_aws_load_balancer_controller ? 1 : 0

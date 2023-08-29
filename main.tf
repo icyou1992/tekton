@@ -98,9 +98,9 @@ module "k8s" {
   enable_aws_ebs_csi_driver           = true
   enable_aws_load_balancer_controller = true
 
-  # k8s = {
-  #   name = "game-2048"
-  # }
+  k8s = {
+    name = "test"
+  }
 }
 
 
