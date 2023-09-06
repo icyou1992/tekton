@@ -4,7 +4,7 @@ locals {
   common = "${local.id}-${local.env}"
 
   cidr = "10.0.0.0/20"
-  key = "key-pfe"
+  key  = "key-pfe"
 }
 
 module "vpc" {
@@ -19,7 +19,7 @@ module "vpc" {
   subnet_public = {
     cidr = [
       cidrsubnet(local.cidr, 4, 1),
-      # cidrsubnet(local.cidr, 4, 2) 
+      cidrsubnet(local.cidr, 4, 2) 
     ]
   }
 
@@ -43,8 +43,8 @@ module "eks" {
   # tag_common = local.common
   tag_common = local.common
 
-  vpc_id     = module.vpc.vpc_id
-  vpc_cidr   = module.vpc.vpc_cidr
+  vpc_id             = module.vpc.vpc_id
+  vpc_cidr           = module.vpc.vpc_cidr
   subnet_public_ids  = module.vpc.subnet_public_ids
   subnet_private_ids = module.vpc.subnet_private_ids
 
@@ -53,13 +53,17 @@ module "eks" {
     instance_type = "t3.medium"
     key           = local.key
 
+    desired_size = 2
+    min_size     = 2
+    max_size     = 4
+
     block_device_mappings = [{
       device_name = "/dev/xvda"
       ebs = [{
         volume_size = 10
         volume_type = "gp3"
-        encrypted = true
-        kms_key_id = data.aws_ebs_default_kms_key.current.key_arn
+        encrypted   = true
+        kms_key_id  = data.aws_ebs_default_kms_key.current.key_arn
       }]
     }]
 

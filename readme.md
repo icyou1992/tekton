@@ -12,15 +12,18 @@
 https://tekton.dev/docs/installation/pipelines/을 참고하여 최신버전의 tekton pipeline을 설치하는 명령어를 입력합니다.  
 `kubectl apply --filename https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml`
 2. install tekton dashboard
-https://tekton.dev/docs/dashboard/install/을 참고하여 최신버전의 tekton dashboard를 설치하는 명령어를 입력합니다.  
+https://tekton.dev/docs/dashboard/install/을 참고하여 최신버전의 tekton dashboard를 설치하는 명령어를 입력합니다. 
 `kubectl apply --filename https://storage.googleapis.com/tekton-releases/dashboard/latest/release.yaml`
 3. tkn 설치 
 https://tekton.dev/docs/cli/을 참고하여 linux ec2에 최신버전의 tkn cli를 설치하는 명령어를 입력합니다.  
-`curl -LO https://github.com/tektoncd/cli/releases/download/v0.30.1/`  
-`tektoncd-cli-0.30.1_Linux-64bit.deb`  
-`sudo dpkg -i ./tektoncd-cli-0.30.1_Linux-64bit.deb`  
+```
+# Get the tar.xz
+curl -LO https://github.com/tektoncd/cli/releases/download/v0.31.2/tkn_0.31.2_Linux_x86_64.tar.gz
+# Extract tkn to your PATH (e.g. /usr/local/bin)
+sudo tar xvzf tkn_0.31.2_Linux_x86_64.tar.gz -C /usr/local/bin/ tkn
+```
 4. install tekton dashboard ingress
-/k8s/tekton/tekton-ingress.yaml 경로에서 코드를 가져와 설치합니다.  
+/k8s/tekton/tekton-ingress.yaml 경로에서 코드를 가져와 설치합니다. (alb는 subnet을 최소 두 개 이상 사용할 수 있어야 합니다.)  
 `kubectl apply -f tekton-ingress.yaml`
 5. install pvc for tekton
 /k8s/tekton/tekton-pvc.yaml 경로에서 코드를 가져와 설치합니다.  
@@ -38,3 +41,5 @@ dashboard에서 pipeline이 잘 실행되었는지 확인합니다.
 `kubectl apply -f test-pod.yaml`  
 `kubectl exec -it test -- /bin/bash`  
 `ls /test`  
+9. 아래 link를 활용하여 tekton trigger를 설치합니다.  
+`https://tekton.dev/docs/triggers/install/`  

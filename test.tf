@@ -57,21 +57,24 @@ resource "aws_instance" "ec2-bastion" {
   echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
   sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
   
-  # sudo mkdir /home/ubuntu/.aws
-  # sudo touch /home/ubuntu/.aws/credentials
-  # sudo echo "[default]" >> /home/ubuntu/.aws/credentials
-  # sudo echo "aws_access_key_id = ${var.aws_access_key_id}" >> /home/ubuntu/.aws/credentials
-  # sudo echo "aws_secret_access_key = ${var.aws_secret_key_id}" >> /home/ubuntu/.aws/credentials
+  sudo mkdir /home/ubuntu/.aws
+  sudo touch /home/ubuntu/.aws/credentials
+  sudo echo "[default]" >> /home/ubuntu/.aws/credentials
+  sudo echo "aws_access_key_id = ${var.aws_access_key_id}" >> /home/ubuntu/.aws/credentials
+  sudo echo "aws_secret_access_key = ${var.aws_secret_key_id}" >> /home/ubuntu/.aws/credentials
 
-  # sudo touch /home/ubuntu/.aws/config
-  # sudo echo "[default]" >> /home/ubuntu/.aws/config
-  # sudo echo "region = ap-northeast-2" >> /home/ubuntu/.aws/config
-  # sudo echo "output = json" >> /home/ubuntu/.aws/config
+  sudo touch /home/ubuntu/.aws/config
+  sudo echo "[default]" >> /home/ubuntu/.aws/config
+  sudo echo "region = ap-northeast-2" >> /home/ubuntu/.aws/config
+  sudo echo "output = json" >> /home/ubuntu/.aws/config
 
   sudo aws eks update-kubeconfig --name ${module.eks.cluster.name}
 
   curl -LO https://github.com/tektoncd/cli/releases/download/v0.30.1/tektoncd-cli-0.30.1_Linux-64bit.deb
   sudo dpkg -i ./tektoncd-cli-0.30.1_Linux-64bit.deb
+
+  kubectl apply --filename https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml
+  kubectl apply --filename https://storage.googleapis.com/tekton-releases/dashboard/latest/release.yaml
 
   EOF
 
