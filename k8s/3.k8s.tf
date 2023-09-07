@@ -1,17 +1,17 @@
 
 
-data "kubernetes_config_map" "aws_auth" {
-  metadata {
-    name = "aws-auth"
-    namespace = "kube-system"
-  }
-}
+# data "kubernetes_config_map" "aws_auth" {
+#   metadata {
+#     name = "aws-auth"
+#     namespace = "kube-system"
+#   }
+# }
 
-resource "kubernetes_namespace" "namespace" {
-  metadata {
-    name = var.k8s.name
-  }
-}
+# resource "kubernetes_namespace" "namespace" {
+#   metadata {
+#     name = var.k8s.name
+#   }
+# }
 
 # resource "kubernetes_deployment" "deployment" {
 #   metadata {

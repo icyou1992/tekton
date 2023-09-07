@@ -1,7 +1,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: clone-read-template
+  name: trigger-template
 spec:
   params:
   - name: url
@@ -12,15 +12,15 @@ spec:
   - apiVersion: tekton.dev/v1beta1
     kind: PipelineRun
     metadata:
-      generateName: clone-read-run-
+      generateName: git-clone-run-
     spec:
       pipelineRef:
-        name: clone-read
+        name: git-clone
       params:
       - name: url
         value: $(tt.params.url)
-      - name: revision
-        value: $(tt.params.revision)
+      - name: branch
+        value: $(tt.params.branch)
       workspaces:
       - name: shared-data
         persistentVolumeClaim:
@@ -29,10 +29,10 @@ spec:
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerBinding
 metadata:
-  name: clone-read-binding
+  name: trigger-binding
 spec: 
   params:
   - name: url
     value: $(body.repository.url)
-  - name: revision
-    value: $(body.repository.revision)
+  - name: branch
+    value: $(body.repository.branch)

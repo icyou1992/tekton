@@ -3,6 +3,18 @@ kind: ServiceAccount
 metadata:
   name: tekton-robot
 ---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: tekton-eventlistener
+spec:
+  serviceAccountName: tekton-robot
+  triggers:
+    - bindings:
+        - ref: trigger-binding
+      template:
+        ref: trigger-template
+---
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
@@ -12,18 +24,6 @@ rules:
 - apiGroups: ["triggers.tekton.dev"]
   resources: ["clustertriggerbindings","clusterinterceptors"]
   verbs: ["get", "list", "watch"]
----
-apiVersion: triggers.tekton.dev/v1alpha1
-kind: EventListener
-metadata:
-  name: tekton-eventlistener
-spec:
-  serviceAccountName: tekton-robot
-  triggers:
-    - bindings:
-        - ref: triggerbinding
-      template:
-        ref: triggertemplate
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -50,24 +50,25 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: tekton-triggers-eventlistener-binding
+  name: tekton-triggers-rolebinding
 subjects:
 - kind: ServiceAccount
   name: tekton-robot
+  namespace: tekton-pipelines
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: tekton-triggers-eventlistener-roles
+  kind: Role
+  name: tekton-triggers-role
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: tekton-triggers-eventlistener-clusterbinding
+  name: tekton-triggers-clusterrolebinding
 subjects:
 - kind: ServiceAccount
   name: tekton-robot
-  namespace: default
+  namespace: tekton-pipelines
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: tekton-triggers-eventlistener-clusterroles
+  name: tekton-triggers-clusterrole

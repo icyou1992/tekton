@@ -1,65 +1,68 @@
+---
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: tekton-buildah-express-pipeline
+  name: git-clone
 spec:
-  workspaces:
-    - name: shared-data
-      description: |
-        This workspace will be shared throughout all steps.
+  description: | 
+    This pipeline clones a git repo, then echoes the README file to the stout.
   params:
-    - name: image-repo
-      type: string
-      description: Docker image name
-      default: kongru/tekton-buildah-express
+  - name: url
+    type: string
+    description: The git repo URL to clone from.
+  - name: branch
+    type: string
+    default: main
+    description: branch
+  workspaces:
+  - name: shared-data
+    description: | 
+      This workspace contains the cloned repo files, so they can be read by the
+      next task.
+  # - name: git-credentials
+  #   description: My ssh credentials
   tasks:
-    - name: clone-repository
-      params:
-        - name: url
-          value: https://github.com/icyou1992/app-sample
-        - name: revision
-          value: "main"
-        - name: deleteExisting
-          value: "true"
-      taskRef:
-        kind: Task
-        name: git-clone
-      workspaces:
-        - name: output
-          workspace: shared-data
-    - name: install-dependencies
-      taskRef:
-        name: npm
-      workspaces:
-        - name: source
-          workspace: shared-data
-      params:
-        - name: ARGS
-          value:
-            - clean-install
-      runAfter:
-        - clone-repository
-    - name: run-tests
-      taskRef:
-        name: npm
-      workspaces:
-        - name: source
-          workspace: shared-data
-      params:
-        - name: ARGS
-          value:
-            - test
-      runAfter:
-        - install-dependencies
-    - name: build-image
-      runAfter:
-        - run-tests
-      params:
-        - name: IMAGE
-          value: "$(params.image-repo):$(tasks.clone-repository.results.commit)"
-      taskRef:
-        kind: Task
-        name: buildah
-      workspaces:
-        - name: source
-          workspace: shared-data
+  - name: fetch-source
+    taskRef:
+      name: git-clone
+    workspaces:
+    - name: output
+      workspace: shared-data
+    # - name: ssh-directory
+    #   workspace: git-credentials
+    params:
+    - name: url
+      value: $(params.url)
+  - name: show-readme
+    runAfter: ["fetch-source"]
+    taskRef:
+      name: show-readme
+    workspaces:
+    - name: source
+      workspace: shared-data
+
+
+
+
+# apiVersion: tekton.dev/v1beta1
+# kind: Pipeline
+# metadata:
+#   name: tekton-sample-pipeline
+# spec:
+#   workspaces:
+#     - name: pipeline-shared-data
+#   tasks:
+#     - name: clone-repository
+#       params:
+#         - name: url
+#           value: https://github.com/icyou1992/tekton-test
+#         - name: revision
+#           value: "master"
+#         - name: deleteExisting
+#           value: "true"
+#       taskRef:
+#         kind: Task
+#         name: git-clone
+#       workspaces:
+#         - name: output
+#           workspace: pipeline-shared-data
