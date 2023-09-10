@@ -1,0 +1,54 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: Trigger
+metadata:
+  name: trigger-demo
+spec:
+  bindings:
+  - name: url
+    value: $(body.repository.url)
+  - name: branch
+    value: $(body.ref)
+  template:
+    ref: trigger-template-demo
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: trigger-template-demo
+spec:
+  params:
+  - name: url
+    default: https://github.com/icyou1992/app-sample
+  - name: branch
+    default: main
+  resourcetemplates:
+  - apiVersion: tekton.dev/v1beta1
+    kind: PipelineRun
+    metadata:
+      generateName: pipeline-run-demo-
+    spec:
+      pipelineRef:
+        name: pipeline-demo
+      podTemplate:
+        securityContext:
+          fsGroup: 65532
+      workspaces:
+      - name: shared-data
+        persistentVolumeClaim:
+          claimName: pvc-demo
+      params:
+      - name: url
+        value: $(tt.params.url)
+      - name: branch
+        value: $(tt.params.branch)
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerBinding
+metadata:
+  name: trigger-binding-demo
+spec: 
+  params:
+  - name: url
+    value: $(body.url)
+  - name: branch
+    value: $(body.branch)

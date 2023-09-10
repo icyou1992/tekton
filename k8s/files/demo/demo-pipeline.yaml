@@ -1,0 +1,35 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: pipeline-demo
+spec:
+  params:
+  - name: url
+    type: string
+  - name: branch
+    type: string
+  workspaces:
+  - name: shared-data
+  tasks:
+    - name: clone-source
+      taskRef:
+        name: git-clone
+      params:
+      - name: url
+        value: $(params.url)
+      - name: revision
+        value: $(params.branch)
+      workspaces:
+      - name: output
+        workspace: shared-data
+    - name: hello
+      taskRef:
+        name: hello
+    - name: goodbye
+      runAfter:
+        - clone-source
+      taskRef:
+        name: goodbye
+      params:
+      - name: username
+        value: tekton

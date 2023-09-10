@@ -42,4 +42,9 @@ dashboard에서 pipeline이 잘 실행되었는지 확인합니다.
 `kubectl exec -it test -- /bin/bash`  
 `ls /test`  
 9. 아래 link를 활용하여 tekton trigger를 설치합니다.  
-`https://tekton.dev/docs/triggers/install/`  
+'''
+kubectl apply --filename \
+https://storage.googleapis.com/tekton-releases/triggers/latest/release.yaml
+kubectl apply --filename \
+https://storage.googleapis.com/tekton-releases/triggers/latest/interceptors.yaml
+'''

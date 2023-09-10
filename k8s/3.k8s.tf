@@ -1,4 +1,14 @@
+# resource "kubernetes_manifest" "tekton-pipelines" {
+#   manifest = yamldecode(file("${path.module}/files/tekton/pipelines/tekton-pipelines.yaml"))
+# }
 
+# resource "kubernetes_manifest" "tekton-dashboard" {
+#   manifest = yamldecode(file("${path.module}/files/tekton/pipelines/tekton-dashboard.yaml"))
+# }
+
+# resource "kubernetes_manifest" "tekton-ingress" {
+#   manifest = yamldecode(file("${path.module}/files/tekton/pipelines/tekton-ingress-dashboard.yaml"))
+# }
 
 # data "kubernetes_config_map" "aws_auth" {
 #   metadata {

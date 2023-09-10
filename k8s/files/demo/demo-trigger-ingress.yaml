@@ -1,8 +1,8 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: tekton-dashboard
-  namespace: tekton-pipelines
+  name: ingress-demo
+  namespace: demo
   annotations:
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
@@ -15,13 +15,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: tekton-dashboard
+            name: service-demo
             port:
               number: 9097
-      - path: /event
-        pathType: Prefix
-        backend:
-          service:
-            name: tekton-webhook
-            port:
-              number: 8080

@@ -35,6 +35,24 @@ module "vpc" {
   }
 }
 
+module "ecr" {
+  source = "./ecr"
+
+  tag_common = local.common
+
+  ecr = {
+    force_delete = true
+  }
+}
+
+module "rds" {
+  source = "./rds"
+
+  tag_common = local.common
+
+  rds = {}
+}
+
 module "eks" {
   source = "./eks"
   # depends_on = [ module.vpc ]
