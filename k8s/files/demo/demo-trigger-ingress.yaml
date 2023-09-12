@@ -11,10 +11,17 @@ spec:
   rules:
   - http:
       paths:
-      - path: /
+      - path: /event
         pathType: Prefix
         backend:
           service:
-            name: service-demo
+            name: el-event-listener-demo
             port:
-              number: 9097
+              number: 8080
+      - path: /hello
+        pathType: Prefix
+        backend:
+          service:
+            name: el-hello-listener
+            port:
+              number: 8080

@@ -42,6 +42,10 @@ dashboard에서 pipeline이 잘 실행되었는지 확인합니다.
 `kubectl exec -it test -- /bin/bash`  
 `ls /test`  
 9. 아래 link를 활용하여 tekton trigger를 설치합니다.  
+
+
+* 노드를 재생성할 경우 pvc와의 연결이 끊어져 pvc를 재생성해야하는 이슈가 있습니다.
+
 '''
 kubectl apply --filename \
 https://storage.googleapis.com/tekton-releases/triggers/latest/release.yaml

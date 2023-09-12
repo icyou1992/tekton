@@ -2,6 +2,8 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: robot-demo
+secrets:
+  - name: auth-ecr
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding

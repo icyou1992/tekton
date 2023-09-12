@@ -8,10 +8,16 @@ spec:
     type: string
   - name: branch
     type: string
+  - name: commit
+    type: string
+  - name: repo-image
+    type: string
+  - name: image-build
+    type: string
   workspaces:
   - name: shared-data
   tasks:
-    - name: clone-source
+    - name: clone
       taskRef:
         name: git-clone
       params:
@@ -19,15 +25,43 @@ spec:
         value: $(params.url)
       - name: revision
         value: $(params.branch)
+      - name: sslVerify
+        value: false
       workspaces:
       - name: output
         workspace: shared-data
+    - name: install-dependencies
+      taskRef:
+        name: npm
+      workspaces:
+        - name: source
+          workspace: shared-data
+      params:
+        - name: ARGS
+          value:
+            - clean-install
+        - name: IMAGE
+          value: $(params.image-build)
+      runAfter:
+        - clone
+    - name: build-image
+      params:
+        - name: IMAGE
+          value: "$(params.repo-image):$(params.commit)"
+      taskRef:
+        kind: Task
+        name: buildah
+      workspaces:
+        - name: source
+          workspace: shared-data
+      runAfter:
+        - install-dependencies
     - name: hello
       taskRef:
         name: hello
     - name: goodbye
       runAfter:
-        - clone-source
+        - clone
       taskRef:
         name: goodbye
       params:

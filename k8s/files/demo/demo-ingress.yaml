@@ -17,10 +17,10 @@ spec:
             name: el-event-listener-demo
             port:
               number: 8080
-      - path: /
+      - path: /hello
         pathType: Prefix
         backend:
           service:
-            name: svc-demo
+            name: el-hello-listener
             port:
-              number: 80
+              number: 8080
