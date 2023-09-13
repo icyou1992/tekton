@@ -56,14 +56,11 @@ spec:
           workspace: shared-data
       runAfter:
         - install-dependencies
-    - name: hello
+    - name: deploy
       taskRef:
-        name: hello
-    - name: goodbye
-      runAfter:
-        - clone
-      taskRef:
-        name: goodbye
+        name: deploy
+      runAfter: 
+        - build-image
       params:
-      - name: username
-        value: tekton
+      - name: image
+        value: "$(params.repo-image):$(params.commit)"

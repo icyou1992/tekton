@@ -1,0 +1,19 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: deploy
+spec:
+  workspaces:
+    - name: shared-data
+  params:
+    - name: path
+      description: The path to the yaml file to deploy within the git source
+    - name: image
+      description: Image name including repository
+  steps:
+    - name: pull
+      image: ubuntu
+      script:
+      - $(params.image) < /$(params.path)/deployment.yaml  | kubectl apply -f -
+
+
