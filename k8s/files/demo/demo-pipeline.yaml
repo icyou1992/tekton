@@ -49,7 +49,7 @@ spec:
       params:
       - name: script
         value: |
-          sed 's/$IMAGE/$(params.hub):$(params.commit)/g'
+          sed -i 's|PARAM_IMAGE|"$(params.hub):$(params.commit)"|g' ./k8s/deployment.yaml
           kubectl apply -f ./k8s/deployment.yaml
       runAfter: 
         - build
