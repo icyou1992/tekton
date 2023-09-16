@@ -8,5 +8,3 @@
 *.tfvars
 
 .terraformrc
-
-rds/
