@@ -10,9 +10,7 @@ spec:
     type: string
   - name: commit
     type: string
-  - name: repo-image
-    type: string
-  - name: image-build
+  - name: hub
     type: string
   workspaces:
   - name: shared-data
@@ -20,6 +18,9 @@ spec:
     - name: clone
       taskRef:
         name: git-clone
+      workspaces:
+      - name: output
+        workspace: shared-data
       params:
       - name: url
         value: $(params.url)
@@ -27,40 +28,28 @@ spec:
         value: $(params.branch)
       - name: sslVerify
         value: false
-      workspaces:
-      - name: output
-        workspace: shared-data
-    - name: install-dependencies
-      taskRef:
-        name: npm
-      workspaces:
-        - name: source
-          workspace: shared-data
-      params:
-        - name: ARGS
-          value:
-            - clean-install
-        - name: IMAGE
-          value: $(params.image-build)
-      runAfter:
-        - clone
-    - name: build-image
-      params:
-        - name: IMAGE
-          value: "$(params.repo-image):$(params.commit)"
+    - name: build
       taskRef:
         kind: Task
         name: buildah
       workspaces:
         - name: source
           workspace: shared-data
+      params:
+        - name: IMAGE
+          value: "$(params.hub):$(params.commit)"
       runAfter:
-        - install-dependencies
+        - clone
     - name: deploy
       taskRef:
-        name: deploy
-      runAfter: 
-        - build-image
+        name: kubernetes-actions
+      workspaces:
+        - name: manifest-dir
+          workspace: shared-data
       params:
-      - name: image
-        value: "$(params.repo-image):$(params.commit)"
+      - name: script
+        value: |
+          sed 's/$IMAGE/$(params.hub):$(params.commit)/g'
+          kubectl apply -f ./k8s/deployment.yaml
+      runAfter: 
+        - build

@@ -32,6 +32,8 @@ spec:
     default: 056231226580.dkr.ecr.ap-northeast-2.amazonaws.com/ecr-pfe-dev
   - name: image-build
     default: docker.io/library/node:16.20.2@sha256:c94b82f9827cab6e421b350965a9ef11b25b13ffbd1030536203d541f55dcbe2
+  - name: path
+    default: k8s
   resourcetemplates:
   - apiVersion: tekton.dev/v1beta1
     kind: PipelineRun
@@ -48,6 +50,9 @@ spec:
       - name: shared-data
         persistentVolumeClaim:
           claimName: pvc-demo
+      - name: secret
+        secret:
+          secretName: aws-credentials
       params:
       - name: url
         value: $(tt.params.url)
@@ -59,6 +64,8 @@ spec:
         value: $(tt.params.repo-image)
       - name: image-build
         value: $(tt.params.image-build)
+      - name: path
+        value: $(tt.params.path)
 ---
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerBinding

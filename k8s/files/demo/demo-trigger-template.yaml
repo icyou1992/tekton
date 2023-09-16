@@ -11,8 +11,8 @@ spec:
     value: $(body.branch)
   - name: commit
     value: $(body.head_commit.id)
-  # - name: repo-image
-  #   value: $(body.repo-image)
+  # - name: script
+  #   value: $(body.script)
   template:
     ref: trigger-template-demo
 ---
@@ -23,15 +23,13 @@ metadata:
 spec:
   params:
   - name: url
-    default: https://github.com/icyou1992/app-sample
+    default: ""
   - name: branch
     default: main
   - name: commit
     default: commit
-  - name: repo-image
-    default: 056231226580.dkr.ecr.ap-northeast-2.amazonaws.com/ecr-pfe-dev
-  - name: image-build
-    default: docker.io/library/node:16.20.2@sha256:c94b82f9827cab6e421b350965a9ef11b25b13ffbd1030536203d541f55dcbe2
+  - name: hub
+    default: icyou1992/tekton
   resourcetemplates:
   - apiVersion: tekton.dev/v1beta1
     kind: PipelineRun
@@ -55,10 +53,8 @@ spec:
         value: $(tt.params.branch)
       - name: commit
         value: $(tt.params.commit)
-      - name: repo-image
-        value: $(tt.params.repo-image)
-      - name: image-build
-        value: $(tt.params.image-build)
+      - name: hub
+        value: $(tt.params.hub)
 ---
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerBinding
@@ -67,11 +63,11 @@ metadata:
 spec: 
   params:
   - name: url
-    value: $(body.url)
+    value: $(body.repository.url)
   - name: branch
-    value: $(body.branch)
+    value: $(body.repository.default_branch)
   - name: commit
     value: $(body.head_commit.id)
-  # - name: repo-image
-  #   value: $(body.repo-image)
+  # - name: script
+  #   value: $(body.script)
   

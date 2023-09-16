@@ -3,7 +3,7 @@ kind: ServiceAccount
 metadata:
   name: robot-demo
 secrets:
-  - name: auth-ecr
+  - name: auth-hub
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -29,3 +29,25 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
   name: tekton-triggers-eventlistener-roles
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: clusterrole-admin-demo
+rules:
+- apiGroups: ["", "apps", "networking.k8s.io"] # "" indicates the core API group
+  resources: ["*"]
+  verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: clusterrolebinding-admin-demo
+subjects:
+- kind: ServiceAccount
+  name: robot-demo
+  namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: clusterrole-admin-demo

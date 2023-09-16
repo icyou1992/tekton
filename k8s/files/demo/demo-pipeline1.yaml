@@ -1,0 +1,80 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: pipeline-demo
+spec:
+  params:
+  - name: url
+    type: string
+  - name: branch
+    type: string
+  - name: commit
+    type: string
+  - name: repo-image
+    type: string
+  - name: image-build
+    type: string
+  - name: path
+    type: string
+  workspaces:
+  - name: shared-data
+  - name: secret
+  tasks:
+    - name: clone
+      taskRef:
+        name: git-clone
+      params:
+      - name: url
+        value: $(params.url)
+      - name: revision
+        value: $(params.branch)
+      - name: sslVerify
+        value: false
+      workspaces:
+      - name: output
+        workspace: shared-data
+    - name: install-dependencies
+      taskRef:
+        name: npm
+      workspaces:
+        - name: source
+          workspace: shared-data
+      params:
+        - name: ARGS
+          value:
+            - clean-install
+        - name: IMAGE
+          value: $(params.image-build)
+      runAfter:
+        - clone
+    - name: ecr-login
+      taskRef:
+        kind: Task
+        name: aws-ecr-login 
+      workspaces:
+        - name: secret
+          workspace: secret
+      runAfter:
+        - install-dependencies
+    - name: build-image
+      params:
+        - name: IMAGE
+          value: "$(params.repo-image):$(params.commit)"
+      taskRef:
+        kind: Task
+        name: buildah
+      workspaces:
+        - name: source
+          workspace: shared-data
+      runAfter:
+        - ecr-login
+    - name: deploy
+      taskRef:
+        name: deploy
+      runAfter: 
+        - build-image
+      params:
+      - name: path
+        value: $(params.path)
+      - name: image
+        value: "$(params.repo-image):$(params.commit)"
