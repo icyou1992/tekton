@@ -28,7 +28,7 @@ spec:
         value: $(params.branch)
       - name: sslVerify
         value: false
-    - name: build
+    - name: build-fe
       taskRef:
         kind: Task
         name: buildah
@@ -36,11 +36,13 @@ spec:
         - name: source
           workspace: shared-data
       params:
+        - name: CONTEXT
+          value: "./fe"
         - name: IMAGE
-          value: "$(params.hub):$(params.commit)"
+          value: "$(params.hub):$(params.commit)-fe"
       runAfter:
         - clone
-    - name: deploy
+    - name: deploy-fe
       taskRef:
         name: kubernetes-actions
       workspaces:
@@ -49,7 +51,34 @@ spec:
       params:
       - name: script
         value: |
-          sed -i 's|PARAM_IMAGE|"$(params.hub):$(params.commit)"|g' ./k8s/deployment.yaml
-          kubectl apply -f ./k8s/deployment.yaml
+          sed -i 's|PARAM_IMAGE|"$(params.hub):$(params.commit)-fe"|g' ./fe/k8s/deployment.yaml
+          kubectl apply -f ./fe/k8s/deployment.yaml
       runAfter: 
-        - build
+        - build-fe
+    - name: build-be
+      taskRef:
+        kind: Task
+        name: buildah
+      workspaces:
+        - name: source
+          workspace: shared-data
+      params:
+        - name: CONTEXT
+          value: "./be"
+        - name: IMAGE
+          value: "$(params.hub):$(params.commit)-be"
+      runAfter:
+        - clone
+    - name: deploy-be
+      taskRef:
+        name: kubernetes-actions
+      workspaces:
+        - name: manifest-dir
+          workspace: shared-data
+      params:
+      - name: script
+        value: |
+          sed -i 's|PARAM_IMAGE|"$(params.hub):$(params.commit)-be"|g' ./be/k8s/deployment.yaml
+          kubectl apply -f ./be/k8s/deployment.yaml
+      runAfter: 
+        - build-be

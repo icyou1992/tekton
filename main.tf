@@ -78,7 +78,7 @@ module "eks" {
     block_device_mappings = [{
       device_name = "/dev/xvda"
       ebs = [{
-        volume_size = 10
+        volume_size = 30
         volume_type = "gp3"
         encrypted   = true
         kms_key_id  = data.aws_ebs_default_kms_key.current.key_arn

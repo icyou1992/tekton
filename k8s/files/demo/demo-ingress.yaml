@@ -24,3 +24,17 @@ spec:
             name: el-hello-listener
             port:
               number: 8080
+      - path: /team
+        pathType: Prefix
+        backend:
+          service:
+            name: deploy-demo-be
+            port:
+              number: 8080
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: deploy-demo-fe
+            port:
+              number: 80
